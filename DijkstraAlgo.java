@@ -1,0 +1,475 @@
+package miniproject;
+import java.util.*;
+
+class Node{
+	int No;
+	String Name;
+	Node next;
+	char type;
+
+	public Node(Node v) {
+		this.No=v.No;
+		this.Name=v.Name;
+		this.type = v.type;
+		this.next=null;
+	}
+
+	public Node(int No,String Name, char type) {
+		this.No=No;
+		this.Name=Name;
+		this.type=type;
+		this.next=null;
+	}
+
+	public static Node findNodeByNo(int vertex, Node[] head)
+	{
+		for (int i = 0; i < head.length; i++) {
+			if(i == vertex)
+			{
+				return head[i];
+			}
+		}
+		return null;
+	}
+
+	public static Node findNodeByName(String name,Node[] head)
+	{
+		for (int i = 0; i < head.length; i++) {
+			if(head[i].Name.equalsIgnoreCase((name)))
+			{
+				return head[i];
+			}
+		}
+		return null;
+	}
+
+}
+
+class Djikstra
+{
+	private static final int NO_PARENT = -1;
+	public static void dijkstra(int[][] adjacencyMatrix,Node src,Node dest) {
+
+		int v=adjacencyMatrix[0].length;
+		boolean[] visited =new boolean[v];
+		int[] distance =new int[v];
+		int[] parents = new int[v];
+
+		//source vertex ka distance would be 0 and baki saaare vertex ka distance would be infinity intially
+		for(int i=0;i<13;i++) {
+			distance[i]=Integer.MAX_VALUE;
+			visited[i]=false;
+		}
+
+		int index=0;
+		for(int i=0;i<v;i++) {
+			if((Creation.head[i].Name).equalsIgnoreCase(src.Name)) {
+				index=i;
+				break;
+			}
+		}
+		distance[index]=0;
+		parents[index] = NO_PARENT;
+		for(int i=0;i<v-1;i++) {
+			//find vertex with minimum distance from the starting vertex
+			int minVertex=findMinVertex(distance,visited);
+			visited[minVertex]=true;
+			//explore the neighbors
+			for(int j=0;j<v;j++) {
+				if(adjacencyMatrix[minVertex][j]!=0 && !visited[j] && distance[minVertex]!=Integer.MAX_VALUE) {
+					int newDist=distance[minVertex]+adjacencyMatrix[minVertex][j];
+					if(newDist<distance[j]) {
+						distance[j]=newDist;
+						parents[j] = minVertex;
+					}
+				}
+			}
+		}
+
+		/*
+        Pune - 1
+        Delhi - 3
+		 */
+
+		System.out.println();
+		System.out.println("SHORTEST DISTANCE FROM " + src.Name + " to " + dest.Name + " IS: "+distance[dest.No]+" km");
+		printPath(dest,parents);
+		System.out.println("\b\b\b");
+	}
+
+	public static int findMinVertex(int[]distance,boolean visited[]) {
+		int minVertex=-1;
+		for(int i=0;i<distance.length;i++) {
+			if(!visited[i] && (minVertex==-1 || distance[i]<distance[minVertex])) {
+				minVertex=i;
+			}
+		}
+		return minVertex;
+	}
+
+	private static void printPath(Node dest, int[] parents)
+	{
+
+		// Base case : Source node has
+		// been processed
+		if (dest.No == -1)
+		{
+			return;
+		}
+
+		try
+		{
+			Node parent = Node.findNodeByNo(parents[dest.No],Creation.head);
+			printPath(parent, parents);
+		}
+		catch(NullPointerException e)
+		{
+		}
+
+		System.out.print(dest.Name + " -> ");
+	}
+
+}
+
+class Creation {
+	Node c1, c2, c3, c4, c5, p1, p2, p3, p4, r1, r2, r3, r4;
+	static int[][] adjmat;
+	static Node[] head = new Node[13]; // number of heads for creating adjacency list
+	int c = 13;// number of vertices total in graph
+	int e = 13;// number of edges
+	int i;
+	int j;
+
+	public void edgeCreate(Node u,Node v, int weight) {
+
+		Node curr;
+		Node new_node=new Node(v);
+		for(i=0;i<c;i++) {
+			if(head[i].No==u.No && head[i].type==u.type) {//type specifies city/petrol pump/rest locations
+				curr=head[i];
+				while(curr.next!=null) {
+					curr=curr.next;
+				}
+				curr.next=new_node;
+			}
+		}
+	}
+
+	public void displayList() {
+		System.out.println();
+		System.out.println("******************************************************************************");
+		System.out.println("Adjacency list: ");
+		for (int i = 0; i <c; i++) {
+			Node curr = head[i];
+			System.out.print(curr.Name + " ");
+			while (curr.next != null) {
+				curr = curr.next;
+				System.out.print("--> " + curr.Name);
+			}
+			System.out.println();
+		}
+		System.out.println();
+		System.out.println("******************************************************************************");
+	}
+
+	public void allCreate() {
+		adjmat=new int[13][13];
+		for(int i=0;i<13;i++) {
+			for(int j=0;j<13;j++) {
+				adjmat[i][j]=0;
+			}
+		}
+		c1=new Node(0,"PUNE",'c');
+		head[0]=c1;
+		c2=new Node(6,"BANGALORE",'c');
+		head[6]=c2;
+		c3=new Node(12,"DELHI",'c');
+		head[12]=c3;
+		c4=new Node(8,"INDORE",'c');
+		head[8]=c4;
+		c5=new Node(3,"KASHMIR",'c');
+		head[3]=c5;
+		p1=new Node(1,"P1",'p');
+		head[1]=p1;
+		p2=new Node(11,"P2",'p');
+		head[11]=p2;
+		p3=new Node(7,"P3",'p');
+		head[7]=p3;
+		p4=new Node(4,"P4",'p');
+		head[4]=p4;
+		r1=new Node(2,"R1",'r');
+		head[2]=r1;
+		r2=new Node(10,"R2",'r');
+		head[10]=r2;
+		r3=new Node(9,"R3",'r');
+		head[9]=r3;
+		r4=new Node(5,"R4",'r');
+		head[5]=r4;
+
+
+		edgeCreate(c1,p1,500);
+		edgeCreate(p1,c1,500);
+		adjmat[0][1]=500;
+		adjmat[1][0]=500;
+
+		edgeCreate(p1,r1,700);
+		edgeCreate(r1,p1,700);
+		adjmat[1][2]=700;
+		adjmat[2][1]=700;
+
+		edgeCreate(r1,c3,200);
+		edgeCreate(c3,r1,200);
+		adjmat[2][12]=200;
+		adjmat[12][2]=200;
+
+		edgeCreate(c3,p2,600);
+		edgeCreate(p2,c3,600);
+		adjmat[12][11]=600;
+		adjmat[11][12]=600;
+
+		edgeCreate(p2,r2,150);
+		edgeCreate(r2,p2,150);
+		adjmat[11][10]=150;
+		adjmat[10][11]=150;
+
+		edgeCreate(r2,r3,800);
+		edgeCreate(r3,r2,800);
+		adjmat[10][9]=800;
+		adjmat[9][10]=800;
+
+		edgeCreate(c4,r3,475);
+		edgeCreate(r3,c4,475);
+		adjmat[8][9]=475;
+		adjmat[9][8]=475;
+
+		edgeCreate(c4,p3,725);
+		edgeCreate(p3,c4,725);
+		adjmat[8][7]=725;
+		adjmat[7][8]=725;
+
+		edgeCreate(c2,p3,650);
+		edgeCreate(p3,c2,650);
+		adjmat[6][7]=650;
+		adjmat[7][6]=650;
+
+		edgeCreate(c2,p4,570);
+		edgeCreate(p4,c2,570);
+		adjmat[6][4]=570;
+		adjmat[4][6]=570;
+
+		edgeCreate(p4,r4,315);
+		edgeCreate(r4,p4,315);
+		adjmat[4][5]=315;
+		adjmat[5][4]=315;
+
+		edgeCreate(p4,c5,740);
+		edgeCreate(c5,p4,740);
+		adjmat[4][3]=740;
+		adjmat[3][4]=740;
+
+		edgeCreate(r1,c5,100);
+		edgeCreate(c5,r1,100);
+		adjmat[2][3]=100;
+		adjmat[3][2]=100;
+	}
+}
+
+public class Main {
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		System.out.println("^^^^^^^WELCOME TO CITY TRAVERSAL^^^^^^");
+		System.out.println("City 1: PUNE");
+		System.out.println("City 2: BANGALORE");
+		System.out.println("City 3: DELHI");
+		System.out.println("City 4: INDORE");
+		System.out.println("City 5: KASHMIR");
+
+
+		Creation cr = new Creation();
+		cr.allCreate();
+
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter your starting city name:");
+		String srcName = sc.next();
+		System.out.print("Enter your destination city name:");
+		String destName = sc.next();
+
+		Node src = Node.findNodeByName(srcName,Creation.head);
+		Node dest = Node.findNodeByName(destName,Creation.head);
+		Djikstra.dijkstra(Creation.adjmat,src,dest);
+		System.out.println();
+		System.out.println("PETROL PUMPS and REST LOCATIONS: ");
+		System.out.println();
+		if(src.Name.equalsIgnoreCase("pune")) {
+			if(dest.Name.equalsIgnoreCase("pune")) {
+
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("bangalore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are: P1 and P4");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+			}
+			else if(dest.Name.equalsIgnoreCase("delhi")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P1");
+				System.out.println("Rest Locations available are: R1");
+			}
+			else if(dest.Name.equalsIgnoreCase("indore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+3);
+				System.out.println("Petrol Pumps available are: P1 and P2");
+				System.out.println("Rest Locations available are: R1 and R2 and R3");
+			}
+			else if(dest.Name.equalsIgnoreCase("kashmir")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P1 ");
+				System.out.println("Rest Locations available are: R1 ");
+			}
+
+		}
+		else if(src.Name.equalsIgnoreCase("bangalore")){
+			if(dest.Name.equalsIgnoreCase("pune")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are: P1 and P4");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+			}
+			else if(dest.Name.equalsIgnoreCase("bangalore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("indore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are: P3");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("delhi")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:P4");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+
+			}
+			else if(dest.Name.equalsIgnoreCase("kashmir")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P4");
+				System.out.println("Rest Locations avialable are: R4 ");
+			}
+
+		}
+		else if(src.Name.equalsIgnoreCase("delhi")){
+			if(dest.Name.equalsIgnoreCase("pune")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P1");
+				System.out.println("Rest Locations available are: R1");
+			}
+			else if(dest.Name.equalsIgnoreCase("bangalore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:P4");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+			}
+			else if(dest.Name.equalsIgnoreCase("delhi")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("indore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:P2");
+				System.out.println("Rest Locations avialable are: R2 and R3");
+			}
+			else if(dest.Name.equalsIgnoreCase("kashmir")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+			}
+
+		}
+		else if(src.Name.equalsIgnoreCase("indore")){
+			if(dest.Name.equalsIgnoreCase("pune")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+3);
+				System.out.println("Petrol Pumps available are: P1 and P2");
+				System.out.println("Rest Locations available are: R1 and R2 and R3");
+			}
+			else if(dest.Name.equalsIgnoreCase("bangalore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are: P3");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("delhi")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:P2");
+				System.out.println("Rest Locations avialable are: R2 and R3");
+			}
+			else if(dest.Name.equalsIgnoreCase("indore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+			else if(dest.Name.equalsIgnoreCase("kashmir")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are:P3 and P4");
+				System.out.println("Rest Locations avialable are: R4");
+			}
+
+		}
+		else if(src.Name.equalsIgnoreCase("kashmir")){
+			if(dest.Name.equalsIgnoreCase("pune")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P1 ");
+				System.out.println("Rest Locations available are: R1 ");
+			}
+			else if(dest.Name.equalsIgnoreCase("bangalore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+1);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are: P4");
+				System.out.println("Rest Locations avialable are: R4 ");
+			}
+			else if(dest.Name.equalsIgnoreCase("delhi")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+2);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are: R1 and R4");
+			}
+			else if(dest.Name.equalsIgnoreCase("indore")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+2);
+				System.out.println("Number of Rest Locations in your journey  are: "+1);
+				System.out.println("Petrol Pumps available are:P3 and P4");
+				System.out.println("Rest Locations avialable are: R4");
+			}
+			else if(dest.Name.equalsIgnoreCase("kashmir")) {
+				System.out.println("Number of Petrol Pumps in your journey are: "+0);
+				System.out.println("Number of Rest Locations in your journey  are: "+0);
+				System.out.println("Petrol Pumps available are:NONE");
+				System.out.println("Rest Locations avialable are:NONE");
+			}
+
+		}
+		System.out.println();
+		System.out.println("Happy and Safe journey ahead :)");
+	}
+
+
+}
